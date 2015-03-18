@@ -2,20 +2,22 @@
 ## File: Data-Serving/setup-server.sh
 ## Usage: setup-server.sh
 ## Author: Yunqi Zhang (yunqi@umich.edu)
+## Modified by Jeongseob Ahn
 
 BENCHMARK="Data-Serving"
 RESULT_DIR="Data-Serving-Result"
 
 # Check all the required applications
 echo "[$BENCHMARK] Check required applications ..."
-REQUIRED_APPS=( "git" "ant" "javac" "sed" )
+REQUIRED_APPS=( "git" "ant" "openjdk-7-jdk" "sed" )
 for app in "${REQUIRED_APPS[@]}"
 do
-  if [ ! type "$app" &> /dev/null ]
-  then
-    echo "$app is needed, please install it before running this script"
-    exit 1
-  fi
+	results=$(dpkg-query -W -f='${Status}\n' $app | cut -f1 -d ' ')
+
+	if [ "$results" != "install" ]; then
+	    echo "$app is needed, please install it before running this script"
+		exit 1
+	fi
 done
 
 # Create directory for the benchmark
@@ -51,6 +53,10 @@ sed -i \
   conf/cassandra.yaml
 sed -i \
   "78 s|/var/lib/cassandra/saved_caches|$RESULT_PATH/saved_caches|" \
+  conf/cassandra.yaml
+# Accept requests from any clients
+sed -i \
+  "181 s|localhost|0.0.0.0|" \
   conf/cassandra.yaml
 sed -i \
   "35 s|/var/log/cassandra/system.log|$RESULT_PATH/system.log|" \
