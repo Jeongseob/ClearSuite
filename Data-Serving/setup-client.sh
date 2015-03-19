@@ -45,7 +45,7 @@ rm -rf apache-cassandra-0.7.3-bin.tar.gz
 
 # Copy the jars from Cassandra to YCSB
 echo "[$BENCHMARK] Copy the jars from Cassandra to YCSB ..."
-scp "$1":"$2"lib/*.jar YCSB/db/cassandra-0.7/lib/
+scp "$1":"$2"/lib/*.jar YCSB/db/cassandra-0.7/lib/
 
 # Build ycsb.jar
 echo "[$BENCHMARK] Build ycsb.jar ..."
@@ -65,3 +65,7 @@ echo "[$BENCHMARK] Generate $MEM_SIZE records for $MEM_SIZE KB memory"
 sed -i "1 s|localhost|$1|" settings_load.dat
 sed -i "2 s|1|$NUM_CORE|" settings_load.dat
 sed -i "3 s|5000000|$MEM_SIZE|" settings_load.dat
+# Modify settings.dat
+sed -i "1 s|localhost|$1|" settings.dat
+sed -i "2 s|2|$NUM_CORE|" settings.dat
+sed -i "3 s|5000000|$MEM_SIZE|" settings.dat
